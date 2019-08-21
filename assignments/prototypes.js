@@ -26,6 +26,8 @@ GameObject.prototype.destroy = function() {
     return `${this.name} was removed from the game.`
 }
 
+CharacterStats.prototype = Object.create(GameObject.prototype);
+
 /*
   === CharacterStats ===
   * healthPoints
@@ -35,7 +37,7 @@ GameObject.prototype.destroy = function() {
 
 function CharacterStats(chStAttributes) {
     GameObject.call(this, chStAttributes);
-    this.healthPoints = chAttributes.healthPoints;
+    this.healthPoints = chStAttributes.healthPoints;
     this.name = chStAttributes.name;
 }
 
@@ -43,7 +45,7 @@ CharacterStats.prototype.takeDamage = function() {
     return `${this.name} took damage.`
 }
 
-
+Humanoid.prototype = Object.create(CharacterStats.prototype);
 /*
   === Humanoid (Having an appearance or character resembling that of a human.) ===
   * team
@@ -54,6 +56,22 @@ CharacterStats.prototype.takeDamage = function() {
   * should inherit takeDamage() from CharacterStats
 */
 
+function Humanoid(humanAttributes) {
+    CharacterStats.call(this, humanAttributes);
+    this.team = humanAttributes.team;
+    this.weapons = humanAttributes.weapons;
+    this.language = humanAttributes.language;
+}
+
+Humanoid.prototype = Object.create(CharacterStats.prototype);
+Humanoid.prototype.greet = function() {
+    return `${this.name} offers a greeting in ${this.language}.`
+}
+
+//for stretch
+Hero.prototype = Object.create(Humanoid.prototype);
+Villain.prototype = Object.create(Humanoid.prototype);
+
 /*
  * Inheritance chain: GameObject -> CharacterStats -> Humanoid
  * Instances of Humanoid should have all of the same properties as CharacterStats and GameObject.
@@ -62,70 +80,141 @@ CharacterStats.prototype.takeDamage = function() {
 
 // Test you work by un-commenting these 3 objects and the list of console logs below:
 
-/*
-  const mage = new Humanoid({
+
+const mage = new Humanoid({
     createdAt: new Date(),
     dimensions: {
-      length: 2,
-      width: 1,
-      height: 1,
+        length: 2,
+        width: 1,
+        height: 1,
     },
     healthPoints: 5,
     name: 'Bruce',
     team: 'Mage Guild',
     weapons: [
-      'Staff of Shamalama',
+        'Staff of Shamalama',
     ],
     language: 'Common Tongue',
-  });
+});
 
-  const swordsman = new Humanoid({
+const swordsman = new Humanoid({
     createdAt: new Date(),
     dimensions: {
-      length: 2,
-      width: 2,
-      height: 2,
+        length: 2,
+        width: 2,
+        height: 2,
     },
     healthPoints: 15,
     name: 'Sir Mustachio',
     team: 'The Round Table',
     weapons: [
-      'Giant Sword',
-      'Shield',
+        'Giant Sword',
+        'Shield',
     ],
     language: 'Common Tongue',
-  });
+});
 
-  const archer = new Humanoid({
+const archer = new Humanoid({
     createdAt: new Date(),
     dimensions: {
-      length: 1,
-      width: 2,
-      height: 4,
+        length: 1,
+        width: 2,
+        height: 4,
     },
     healthPoints: 10,
     name: 'Lilith',
     team: 'Forest Kingdom',
     weapons: [
-      'Bow',
-      'Dagger',
+        'Bow',
+        'Dagger',
     ],
     language: 'Elvish',
-  });
+});
 
-  console.log(mage.createdAt); // Today's date
-  console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
-  console.log(swordsman.healthPoints); // 15
-  console.log(mage.name); // Bruce
-  console.log(swordsman.team); // The Round Table
-  console.log(mage.weapons); // Staff of Shamalama
-  console.log(archer.language); // Elvish
-  console.log(archer.greet()); // Lilith offers a greeting in Elvish.
-  console.log(mage.takeDamage()); // Bruce took damage.
-  console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
-*/
+console.log(mage.createdAt); // Today's date
+console.log(archer.dimensions); // { length: 1, width: 2, height: 4 }
+console.log(swordsman.healthPoints); // 15
+console.log(mage.name); // Bruce
+console.log(swordsman.team); // The Round Table
+console.log(mage.weapons); // Staff of Shamalama
+console.log(archer.language); // Elvish
+console.log(archer.greet()); // Lilith offers a greeting in Elvish.
+console.log(mage.takeDamage()); // Bruce took damage.
+console.log(swordsman.destroy()); // Sir Mustachio was removed from the game.
+
 
 // Stretch task: 
-// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.  
+// * Create Villain and Hero constructor functions that inherit from the Humanoid constructor function.
 // * Give the Hero and Villains different methods that could be used to remove health points from objects which could result in destruction if health gets to 0 or drops below 0;
+
+
+//villain constructor with methods
+function Villain(villainAttributes) {
+    Humanoid.call(this, villainAttributes);
+}
+
+Villain.prototype.throwClub = function(damage) {
+    if (damage.healthPoints === 0)
+        return damage.destroy();
+    return damage.healthPoints -= 1;
+}
+
+//hero constructor with methods
+function Hero(heroAttributes) {
+    Humanoid.call(this, heroAttributes);
+}
+
+Hero.prototype.castSpell = function(damage) {
+    if (damage.healthPoints === 0)
+        return damage.destroy();
+    return damage.healthPoints -= 5;
+}
+
 // * Create two new objects, one a villain and one a hero and fight it out with methods!
+
+const troll = new Villain({
+    createdAt: new Date(),
+    dimensions: {
+        length: 15,
+        width: 8,
+        height: 20,
+    },
+    healthPoints: 8,
+    name: 'Quirinus',
+    team: 'Scandinavian Forest',
+    weapons: [
+        'Club',
+        'Body',
+    ],
+    language: 'Troll',
+});
+
+const wizard = new Hero({
+    createdAt: new Date(),
+    dimensions: {
+        length: 9,
+        width: 3,
+        height: 6,
+    },
+    healthPoints: 15,
+    name: 'Weasley',
+    team: 'England',
+    weapons: [
+        'Wand',
+    ],
+    language: 'English',
+});
+
+troll.throwClub(wizard);
+wizard.castSpell(troll);
+console.log(troll);
+console.log(wizard);
+console.log(troll);
+console.log(wizard);
+console.log(troll);
+console.log(wizard);
+
+console.log(wizard.weapons);
+console.log(troll.greet());
+console.log(wizard.takeDamage());
+console.log(troll.destroy());
